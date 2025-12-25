@@ -7,30 +7,13 @@ using namespace std;
 
 int main()
 { 
-    list<string> l1={"ali","reza","hello"};
-	string firstname, lastname, birthyear, birthmonth, date;
-	cout << "Whats your firstname? "; getline(cin, firstname);
-	cout << "Whats your lastname? "; getline(cin, lastname);
-	cout << "Whats your birth year? "; getline(cin, birthyear);
-	cout << "Whats your birth month? "; getline(cin, birthmonth);
-	cout << "Whats your birth date? "; getline(cin, date);
+std::list<std::string> lst = {"a", "b", "c", "d"};
 
+int index = 0;
 
-	ofstream myfile;
+auto it = lst.begin();
+std::advance(it, index);
 
-	myfile.open("name.txt");
-    myfile << "username,";
-    for (string n : l1)
-    {
-        myfile << n << ",";
-    };
-	myfile <<endl;
-	myfile << firstname<<endl;
-	myfile << lastname<<endl;
-	myfile << birthyear<<endl;
-	myfile << birthmonth<<endl;
-	myfile << date<<endl;
-	myfile.close();
+std::cout << *it;   // "c"
 
-	return 0;
 }

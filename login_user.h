@@ -2,6 +2,7 @@
 #include <iostream>
 #include "simpledata.hpp"
 #include "user.h"
+#include "list"
 using namespace std;
 class login_user:public user
 {
@@ -18,7 +19,7 @@ public:
     void log_out();
     void new_conversation();
     void user_contact();
-    void show_conversation();
+    void show_all_users(list<string> &user_names,list<string> &full_names,list<string> &birthday,list<string> &passwords,list<string> &time_creates);
     
 };
 

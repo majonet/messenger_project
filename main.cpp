@@ -155,7 +155,6 @@ void login(list<string> &user_names,list<string> &passwords){
     try{
     if(passwords_map[user_map[now_user]]==pass){
       cout<<"you loging succsesfully."<<endl;
-
     }
     else{
     throw myerror("password is incorrect");}
