@@ -7,6 +7,8 @@
 #include "login_user.h"
 #include <fstream>
 #include <sstream>
+#include <fstream>
+#include <set>
 using namespace std;
 
 list<string> load_data(string find) {
@@ -184,6 +186,69 @@ void save_contacts(const string& filename,
     file.close();
 }
 
+
+void append_pairs_with_message(const string& filename,
+                               const map<string, list<string>>& conv,
+                               const string& message)
+{
+    set<pair<string, string>> existing_pairs;
+    ifstream in(filename);
+    string line;
+    while (getline(in, line)) {
+        if (line.empty()) continue;
+
+        string u, c;
+        stringstream ss(line);
+        getline(ss, u, ',');
+        getline(ss, c, ',');
+
+        if (u > c) swap(u, c);
+        existing_pairs.insert({u, c});
+    }
+    in.close();
+    ofstream out(filename, ios::app);
+
+    for (const auto& [user, contacts] : conv) {
+        for (const auto& contact : contacts) {
+
+            if (user == contact) continue;
+
+            string a = user;
+            string b = contact;
+            if (a > b) swap(a, b);
+
+            if (existing_pairs.count({a, b}) == 0) {
+                out << a << "," << b << "," << message << "\n";
+                existing_pairs.insert({a, b});
+            }
+        }
+    }
+
+    out.close();
+}
+
+map<list<string>, list<string>> load_messages(const string& filename,
+                   map<list<string>, list<string>>& message_conv)
+{
+    ifstream in(filename);
+    string line;
+    while (getline(in, line)) {
+        if (line.empty()) continue;
+        string u1, u2, msg;
+        stringstream ss(line);
+        getline(ss, u1, ',');
+        getline(ss, u2, ',');
+        getline(ss, msg);
+        if (msg.empty()) msg = "";
+        list<string> key = {u1, u2};
+        key.sort();
+        message_conv[key].push_back(msg);
+    }
+    in.close();
+    return message_conv;
+}
+
+
 //login
 void login(list<string> &user_names,list<string> &full_names,list<string> &birthday,list<string> &passwords,list<string> &time_creates){
   cout<< "enter user name : "<<endl;
@@ -214,37 +279,49 @@ void login(list<string> &user_names,list<string> &full_names,list<string> &birth
 do {
     in_user.show_menu();
     cin >> choice;
-
     switch (choice) {
-    case 1:
+    case 1:{
         in_user.show_all_users(user_names, full_names, birthday, passwords, time_creates);
-        break;
+        break;}
 
-    case 2:
+    case 2:{
         map<string, list<string>> conv=load_contacts("contact.txt");
         try{
         conv = in_user.new_conversation(in_user, conv, user_names);
         save_contacts("contact.txt", conv);  
+        append_pairs_with_message("conv_message.txt",conv,"");
       }
       catch (myerror &e) {
         cout << "Error: ";
         e.show_error();
         }
-        break;
+        break;}
 
     case 3:
-        map<string, list<string>> conv=load_contacts("contact.txt");
-        
-        in_user.show_conversation(current_user, conv);
-        break;
+        {map<string, list<string>> conv1=load_contacts("contact.txt");
+        in_user.show_conversation(in_user, conv1);
+        break;}
 
     case 4:
-        message_conv = in_user.show_send_message(current_user, message_conv);
-        break;
-
+        {map<list<string>,list<string>> message_conv3=load_messages("conv_message.txt",message_conv3);
+        message_conv3 = in_user.show_send_message(in_user, message_conv3);
+        break;}
     case 5:
-        in_user.log_out();
-        break;
+        {in_user.log_out();
+        in_user.~login_user();
+        cout<<" chose on of this 1_login  2_sign up: "<<endl;
+        int st_input;
+        cin>>st_input;
+        if (st_input == 1) {
+        login(user_names, full_names, birthday, passwords, time_creates);
+        } 
+        else if (st_input == 2) {
+            sign_up(user_names, full_names, birthday, passwords, time_creates);
+        } 
+        else {
+            cout << "Invalid input, please choose 1 or 2." << endl;
+        }
+        break;}
 
     default:
         cout << "Invalid choice\n";
@@ -274,6 +351,16 @@ int main()
    list<string> birthday   = load_data("birthday");
    list<string> passwords=load_data("passwords");
    list<string>time_creates=load_data("time_creates");
-  // sign_up();
-  //login(user_names,passwords);
+   cout<<" chose on of this 1_login  2_sign up: "<<endl;
+   int st_input;
+   cin>>st_input;
+   if (st_input == 1) {
+   login(user_names, full_names, birthday, passwords, time_creates);
+    } 
+   else if (st_input == 2) {
+        sign_up(user_names, full_names, birthday, passwords, time_creates);
+    } 
+   else {
+        cout << "Invalid input, please choose 1 or 2." << endl;
+    }
 }

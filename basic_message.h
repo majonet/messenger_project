@@ -13,7 +13,7 @@ private:
 public:
     basic_message(user sender,char* date_time):sender(sender),date_time(date_time){};
     basic_message(){};
-    ~basic_message();
+    ~basic_message(){};
     virtual void print_message(){cout<<"your message created (basic message);"<<endl;};
 };
 

@@ -1,14 +1,5 @@
-#pragma once
 #include "login_user.h"
-#include <iostream>
-#include <ctime>
-#include <list>
-#include <bits/stdc++.h>
-#include <map>
-#include "privet_chat.h"
-#include "simpledata.hpp"
-#include "voice_message.h"
-#include "text_message.h"
+
 void search_user(string b,const map<string, int>& user_map,
                       const list<string>& full_names,
                       const list<string>& birthday,

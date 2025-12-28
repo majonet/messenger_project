@@ -2,7 +2,14 @@
 #include <iostream>
 #include "simpledata.hpp"
 #include "user.h"
-#include "list"
+#include <list>
+#include <iostream>
+#include <ctime>
+#include <bits/stdc++.h>
+#include <map>
+#include "privet_chat.h"
+#include "voice_message.h"
+#include "text_message.h"
 using namespace std;
 class login_user:public user
 {
