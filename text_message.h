@@ -12,5 +12,4 @@ public:
     text_message(){};
     ~text_message(){};
     void print_message()override {cout<<text_prompt<<"( this is a text message )"<<endl;};
-
 };

@@ -4,6 +4,9 @@
 #include <bits/stdc++.h>
 #include "simpledata.hpp"
 #include <map>
+#include "login_user.h"
+#include <fstream>
+#include <sstream>
 using namespace std;
 
 list<string> load_data(string find) {
@@ -137,14 +140,60 @@ unordered_map<int, T> list_to_index_map_RE(const list<T>& lst)
 
     return result;
 }
+
+map<string, list<string>> load_contacts(const string& filename) {
+    map<string, list<string>> conv;
+    ifstream file(filename);
+
+    if (!file) {
+        cout << "contact file not found, starting empty.\n";
+        return conv;
+    }
+
+    string line;
+    while (getline(file, line)) {
+        if (line.empty()) continue;
+
+        stringstream ss(line);
+        string user, contact;
+
+        // first value = user
+        getline(ss, user, ',');
+
+        // remaining values = contacts
+        while (getline(ss, contact, ',')) {
+            conv[user].push_back(contact);
+        }
+    }
+
+    file.close();
+    return conv;
+}
+void save_contacts(const string& filename,
+                   const map<string, list<string>>& conv) {
+    ofstream file(filename, ios::trunc);
+
+    for (const auto& [user, contacts] : conv) {
+        file << user;
+        for (const auto& c : contacts) {
+            file << "," << c;
+        }
+        file << "\n";
+    }
+
+    file.close();
+}
+
 //login
-void login(list<string> &user_names,list<string> &passwords){
+void login(list<string> &user_names,list<string> &full_names,list<string> &birthday,list<string> &passwords,list<string> &time_creates){
   cout<< "enter user name : "<<endl;
   string now_user;
   cin>> now_user;
   auto user_map = list_to_index_map(user_names);
   auto passwords_map = list_to_index_map_RE(passwords);
-
+  auto full_names_map = list_to_index_map_RE(full_names);
+  auto birthday_map = list_to_index_map_RE(birthday);
+  auto time_creates_map= list_to_index_map_RE(time_creates);
   try{
    if (user_map.count(now_user)) {  
     // cout << "User found, index: " << user_map[now_user] << endl;
@@ -153,8 +202,55 @@ void login(list<string> &user_names,list<string> &passwords){
     cin>> pass;
     int h = user_map[now_user];
     try{
-    if(passwords_map[user_map[now_user]]==pass){
+    if(passwords_map[h]==pass){
       cout<<"you loging succsesfully."<<endl;
+      time_t now = time(0);          
+      char* dt = ctime(&now);
+      string dt_str(dt); 
+    // int id,const string& user_name,const string& real_name,const string& password,string birth_day,string date_time,string login_time)
+      login_user  in_user(h,now_user,full_names_map[h],passwords_map[h],birthday_map[h],time_creates_map[h],dt_str);
+      bool epoch=true;
+      int choice;
+do {
+    in_user.show_menu();
+    cin >> choice;
+
+    switch (choice) {
+    case 1:
+        in_user.show_all_users(user_names, full_names, birthday, passwords, time_creates);
+        break;
+
+    case 2:
+        map<string, list<string>> conv=load_contacts("contact.txt");
+        try{
+        conv = in_user.new_conversation(in_user, conv, user_names);
+        save_contacts("contact.txt", conv);  
+      }
+      catch (myerror &e) {
+        cout << "Error: ";
+        e.show_error();
+        }
+        break;
+
+    case 3:
+        map<string, list<string>> conv=load_contacts("contact.txt");
+        
+        in_user.show_conversation(current_user, conv);
+        break;
+
+    case 4:
+        message_conv = in_user.show_send_message(current_user, message_conv);
+        break;
+
+    case 5:
+        in_user.log_out();
+        break;
+
+    default:
+        cout << "Invalid choice\n";
+    }
+        } while (choice != 5);
+
     }
     else{
     throw myerror("password is incorrect");}
