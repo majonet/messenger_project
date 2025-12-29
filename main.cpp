@@ -10,6 +10,7 @@
 #include <fstream>
 #include <set>
 #include <limits>
+#include <cstdlib>
 using namespace std;
 
 list<string> load_data(string find) {
@@ -28,7 +29,7 @@ list<string> load_data(string find) {
 
             while (getline(ss, a, ',')) {
                 mylist.push_back(a);
-                cout << a << endl;
+                // cout << a << endl;
             }
         }
     }
@@ -70,6 +71,13 @@ list<string> load_data(string find) {
 // 	myfile <<endl;
 
 // }
+void save_line(ofstream& out, string title, list<string>& data) {
+    // out << title;
+    for (string x : data) {
+        out << x << "," ;
+    }
+    out << endl;
+}
 void sign_up(list<string> &user_names,list<string> &full_names,list<string> &birthday,list<string> &passwords,list<string> &time_creates){
 //user_name
   cout<< "enter user name : "<<endl;
@@ -87,6 +95,7 @@ void sign_up(list<string> &user_names,list<string> &full_names,list<string> &bir
     cout << "Error: ";
     e.show_error();
     sign_up(user_names,full_names,birthday,passwords,time_creates);
+    return;
 }
 //full_name
   cout<< "enter user full name : "<<endl;
@@ -99,16 +108,16 @@ void sign_up(list<string> &user_names,list<string> &full_names,list<string> &bir
     try {
       cin >> s;
       cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
     }
     catch (myerror &e) {
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
         cout << "Error: ";
         e.show_error();
         full_names.pop_back();
         user_names.pop_back();
         sign_up(user_names,full_names,birthday,passwords,time_creates);
-        
-} 
+        return;} 
   string b= s.date_retrun();
   birthday.push_back(b);
 //password
@@ -121,12 +130,21 @@ void sign_up(list<string> &user_names,list<string> &full_names,list<string> &bir
    } while (pass.length() <= 6);
   passwords.push_back(pass);
 //time_created
+//    time_t now = time(0);
+//    char* date_time = ctime(&now);
    time_t now = time(0);
-   char* date_time = ctime(&now);
+   string date_time = ctime(&now);
+   date_time.pop_back();
    cout<< "date time created : "<<date_time<<endl;
   //  time_creates=load_data("time_creates");
    time_creates.push_back(date_time);
-
+    ofstream file("textFile.txt");
+    save_line(file, "username",user_names);
+    save_line(file, "fullname",full_names);
+    save_line(file, "birthday",birthday);
+    save_line(file, "passwords",passwords);
+    save_line(file, "time_creates", time_creates);
+    file.close();
    }
 // (value,int)
 template <typename T>
@@ -196,14 +214,6 @@ void save_contacts(const string& filename,
     }
 
     file.close();
-}
-
-void save_line(ofstream& out, string title, list<string>& data) {
-    // out << title;
-    for (string x : data) {
-        out << x << "," ;
-    }
-    out << endl;
 }
 
 void append_pairs_with_message(const string& filename,
@@ -378,6 +388,7 @@ do {
 
     default:
         cout << "Invalid choice\n";
+        break;
     }
         } while (choice != 5);
 
@@ -404,25 +415,28 @@ int main()
    list<string> birthday   = load_data("birthday");
    list<string> passwords=load_data("passwords");
    list<string>time_creates=load_data("time_creates");
-   cout<<" chose on of this 1_login  2_sign up: "<<endl;
-   int st_input;
-   cin>>st_input;
-   cin.ignore(numeric_limits<streamsize>::max(), '\n');
-   if (st_input == 1) {
-   login(user_names, full_names, birthday, passwords, time_creates);
-    } 
-   else if (st_input == 2) {
-        sign_up(user_names, full_names, birthday, passwords, time_creates);
-    } 
-   else {
-        cout << "Invalid input, please choose 1 or 2." << endl;
+//    cout<<" chose on of this 1_login  2_sign up: "<<endl;
+//    int st_input;
+//    cin>>st_input;
+while (true) {
+    string st_input;
+    cout << "1. Login  2. Sign up  q. Quit Choose: ";
+    cin >> st_input;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    if (st_input == "1") {
+        login(user_names, full_names, birthday, passwords, time_creates);
     }
-    ofstream file("textFile.txt");
-    save_line(file, "username",user_names);
-    save_line(file, "fullname",full_names);
-    save_line(file, "birthday",birthday);
-    save_line(file, "passwords",passwords);
-    save_line(file, "time_creates", time_creates);
-    file.close();
-    return 0;
+    else if (st_input == "2") {
+        sign_up(user_names, full_names, birthday, passwords, time_creates);
+    }
+    else if (st_input == "q") {
+        cout << "Goodbye!" << endl;
+        break;
+    }
+    else {
+        cout << "Invalid input, please choose 1, 2, or q." << endl;
+    }
+    system("cls"); 
+}
+
 }
