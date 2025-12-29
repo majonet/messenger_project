@@ -9,6 +9,7 @@
 #include <sstream>
 #include <fstream>
 #include <set>
+#include <limits>
 using namespace std;
 
 list<string> load_data(string find) {
@@ -34,46 +35,47 @@ list<string> load_data(string find) {
 
     return mylist;
 }
-void save_data(list<string> &user_names,list<string> &full_names,list<string> &birthday,list<string> &passwords,list<string> &time_creates){
-  ofstream myfile;
-	myfile.open("textFile.txt");
-  myfile << "username,";
-    for (string n : user_names)
-    {
-        myfile << n << ",";
-    };
-	myfile <<endl;
-  myfile << "fullname,";
-    for (string n : full_names)
-    {
-        myfile << n << ",";
-    };
-	myfile <<endl;
-  myfile << "birthday,";
-    for (string n : birthday)
-    {
-        myfile << n << ",";
-    };
-	myfile <<endl;
-  myfile << "passwords,";
-    for (string n : passwords)
-    {
-        myfile << n << ",";
-    };
-	myfile <<endl;
-  myfile << "time_creates,";
-    for (string n : time_creates)
-    {
-        myfile << n << ",";
-    };
-	myfile <<endl;
+// void save_data(list<string> &user_names,list<string> &full_names,list<string> &birthday,list<string> &passwords,list<string> &time_creates){
+//   ofstream myfile;
+// 	myfile.open("textFile.txt");
+//   myfile << "username,";
+//     for (string n : user_names)
+//     {
+//         myfile << n << ",";
+//     };
+// 	myfile <<endl;
+//   myfile << "fullname,";
+//     for (string n : full_names)
+//     {
+//         myfile << n << ",";
+//     };
+// 	myfile <<endl;
+//   myfile << "birthday,";
+//     for (string n : birthday)
+//     {
+//         myfile << n << ",";
+//     };
+// 	myfile <<endl;
+//   myfile << "passwords,";
+//     for (string n : passwords)
+//     {
+//         myfile << n << ",";
+//     };
+// 	myfile <<endl;
+//   myfile << "time_creates,";
+//     for (string n : time_creates)
+//     {
+//         myfile << n << ",";
+//     };
+// 	myfile <<endl;
 
-}
+// }
 void sign_up(list<string> &user_names,list<string> &full_names,list<string> &birthday,list<string> &passwords,list<string> &time_creates){
 //user_name
   cout<< "enter user name : "<<endl;
   string now_user;
-  cin>> now_user;
+//   cin>> now_user;
+  getline(cin,now_user);
   try{
    if (find(user_names.begin(), user_names.end(),now_user) != user_names.end()) {
       throw myerror("this user_name already exist");
@@ -82,22 +84,31 @@ void sign_up(list<string> &user_names,list<string> &full_names,list<string> &bir
    user_names.push_back(now_user);}
   }
   catch (myerror &e) {
+    cout << "Error: ";
     e.show_error();
-    }
+    sign_up(user_names,full_names,birthday,passwords,time_creates);
+}
 //full_name
   cout<< "enter user full name : "<<endl;
   string f_name;
-  cin>> f_name;
+//   cin>> f_name;
+  getline(cin,f_name);
   full_names.push_back(f_name);
 //birth_day
    simpledata s;
     try {
       cin >> s;
+      cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
     }
     catch (myerror &e) {
         cout << "Error: ";
         e.show_error();
-    } 
+        full_names.pop_back();
+        user_names.pop_back();
+        sign_up(user_names,full_names,birthday,passwords,time_creates);
+        
+} 
   string b= s.date_retrun();
   birthday.push_back(b);
 //password
@@ -105,15 +116,16 @@ void sign_up(list<string> &user_names,list<string> &full_names,list<string> &bir
   string pass;
   do {
       cout << "Enter password (min 7 characters): ";
-      cin >> pass;
+    //   cin >> pass;
+    getline(cin,pass);
    } while (pass.length() <= 6);
   passwords.push_back(pass);
 //time_created
    time_t now = time(0);
    char* date_time = ctime(&now);
    cout<< "date time created : "<<date_time<<endl;
-   time_creates=load_data("time_creates");
-   full_names.push_back(date_time);
+  //  time_creates=load_data("time_creates");
+   time_creates.push_back(date_time);
 
    }
 // (value,int)
@@ -186,6 +198,13 @@ void save_contacts(const string& filename,
     file.close();
 }
 
+void save_line(ofstream& out, string title, list<string>& data) {
+    // out << title;
+    for (string x : data) {
+        out << x << "," ;
+    }
+    out << endl;
+}
 
 void append_pairs_with_message(const string& filename,
                                const map<string, list<string>>& conv,
@@ -226,6 +245,32 @@ void append_pairs_with_message(const string& filename,
 
     out.close();
 }
+void save_messages(
+    const map<list<string>, list<string>>& message_conv3,
+    const string& filename)
+{
+    ofstream file(filename);
+    if (!file) {
+        cout << "Cannot open file\n";
+        return;
+    }
+
+    for (const auto& item : message_conv3) {
+        const list<string>& users = item.first;
+        const list<string>& messages = item.second;
+        auto it = users.begin();
+        file << *it;
+        ++it;
+        file << "," << *it;
+        for (const string& msg : messages) {
+            file << "," << msg;
+        }
+
+        file << "\n";
+    }
+
+    file.close();
+}
 
 map<list<string>, list<string>> load_messages(const string& filename,
                    map<list<string>, list<string>>& message_conv)
@@ -248,12 +293,12 @@ map<list<string>, list<string>> load_messages(const string& filename,
     return message_conv;
 }
 
-
 //login
 void login(list<string> &user_names,list<string> &full_names,list<string> &birthday,list<string> &passwords,list<string> &time_creates){
   cout<< "enter user name : "<<endl;
   string now_user;
-  cin>> now_user;
+//   cin>> now_user;
+  getline(cin,now_user);
   auto user_map = list_to_index_map(user_names);
   auto passwords_map = list_to_index_map_RE(passwords);
   auto full_names_map = list_to_index_map_RE(full_names);
@@ -264,7 +309,8 @@ void login(list<string> &user_names,list<string> &full_names,list<string> &birth
     // cout << "User found, index: " << user_map[now_user] << endl;
     cout<< "enter your password : "<<endl;
     string pass;
-    cin>> pass;
+    // cin>> pass;
+    getline(cin,pass);
     int h = user_map[now_user];
     try{
     if(passwords_map[h]==pass){
@@ -279,6 +325,7 @@ void login(list<string> &user_names,list<string> &full_names,list<string> &birth
 do {
     in_user.show_menu();
     cin >> choice;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
     switch (choice) {
     case 1:{
         in_user.show_all_users(user_names, full_names, birthday, passwords, time_creates);
@@ -303,8 +350,12 @@ do {
         break;}
 
     case 4:
-        {map<list<string>,list<string>> message_conv3=load_messages("conv_message.txt",message_conv3);
-        message_conv3 = in_user.show_send_message(in_user, message_conv3);
+        {map<list<string>,list<string>> message_conv3;
+        load_messages("conv_message.txt",message_conv3);
+        // message_conv3 = in_user.show_send_message(in_user, message_conv3);
+        // cout<<"asdas"<<endl;
+        message_conv3=in_user.show_send_message(in_user, message_conv3);
+        save_messages(message_conv3,"conv_message.txt");
         break;}
     case 5:
         {in_user.log_out();
@@ -312,6 +363,8 @@ do {
         cout<<" chose on of this 1_login  2_sign up: "<<endl;
         int st_input;
         cin>>st_input;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
         if (st_input == 1) {
         login(user_names, full_names, birthday, passwords, time_creates);
         } 
@@ -354,6 +407,7 @@ int main()
    cout<<" chose on of this 1_login  2_sign up: "<<endl;
    int st_input;
    cin>>st_input;
+   cin.ignore(numeric_limits<streamsize>::max(), '\n');
    if (st_input == 1) {
    login(user_names, full_names, birthday, passwords, time_creates);
     } 
@@ -363,4 +417,12 @@ int main()
    else {
         cout << "Invalid input, please choose 1 or 2." << endl;
     }
+    ofstream file("textFile.txt");
+    save_line(file, "username",user_names);
+    save_line(file, "fullname",full_names);
+    save_line(file, "birthday",birthday);
+    save_line(file, "passwords",passwords);
+    save_line(file, "time_creates", time_creates);
+    file.close();
+    return 0;
 }

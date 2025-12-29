@@ -1,6 +1,3 @@
-username,ali,reza,hello,
-asdf
-sdf
-wef
-sdf
-sfd
+username,ali,hossein,sara
+fullname,Ali A,Hossein K,Sara R
+birthday,2000,1999,2001

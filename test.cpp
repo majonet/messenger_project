@@ -1,57 +1,19 @@
-#include <iostream>   // needed for cout
-#include <fstream>
-#include <sstream>
-#include <map>
-#include <list>
+#include <iostream>
 #include <string>
-#include <algorithm>
-
+#include <limits>
 using namespace std;
 
-void load_messages(const string& filename,
-                   map<list<string>, list<string>>& message_conv)
-{
-    ifstream in(filename);
-    string line;
-
-    while (getline(in, line)) {
-        if (line.empty()) continue;
-
-        string u1, u2, msg;
-        stringstream ss(line);
-
-        // read first two users
-        getline(ss, u1, ',');
-        getline(ss, u2, ',');
-
-        // rest of line = message
-        getline(ss, msg);
-        if (msg.empty()) msg = "";
-
-        // normalize alphabetical order for key
-        list<string> key = {u1, u2};
-        key.sort();
-
-        // add message
-        message_conv[key].push_back(msg);
-    }
-
-    in.close();
-}
-
 int main() {
-    map<list<string>, list<string>> message_conv;
+    string name;
+    cout<<"simple  test cin"<<endl;
+    // cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    int i;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    // cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    cout << "Enter your full name: ";
+    getline(cin, name);   // reads the whole line (with spaces)
 
-    load_messages("pairs.txt", message_conv);
-
-    // print loaded messages
-    for (const auto& [key, msgs] : message_conv) {
-        auto it = key.begin();
-        cout << *it++ << " - " << *it << " :\n";
-        for (const auto& m : msgs) {
-            cout << "    " << m << endl;
-        }
-    }
+    cout << "You entered: " << name << endl;
 
     return 0;
 }

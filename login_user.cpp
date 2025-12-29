@@ -62,6 +62,7 @@ void login_user::show_all_users(list<string> &user_names,list<string> &full_name
     int a;
     cout<<"enter your chose:  ";
     cin>>a;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
     switch (a) {
 
 case 1: {
@@ -74,7 +75,8 @@ case 1: {
 case 2: {
     cout << "enter username or name for search: " << endl;
     string b;
-    cin >> b;
+    // cin >> b;
+    getline(cin,b); 
     auto user_map = list_to_index_map(user_names);
     auto search = [b](const map<string, int>& user_map,
                       const list<string>& full_names,
@@ -109,6 +111,7 @@ case 3: {
     int ch;
     cout<<"enter your chose:  ";
     cin>>ch;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
     switch (ch){
     case 1:{ 
     auto user_map = list_to_index_map(user_names);
@@ -144,7 +147,8 @@ map<string, list<string>> login_user::new_conversation(login_user& u, map<string
     string s = u.get_user_name();
     cout<<"enter username you want for privet chat :  "<<endl;
     string si;
-    cin>>si;
+    // cin>>si;
+    getline(cin, si);
     auto user_map = list_to_index_map(user_names);
     if (user_map.count(si)) {
         cout << "user_name is found\n";
@@ -167,20 +171,18 @@ void login_user::show_conversation(const login_user& u,map<string, list<string>>
     cout<<"choose one 1_sort base name. 2_search with user_name"<<endl;
     int i;
     cin>> i;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
     list<string> contact_user=conv[u.get_user_name()];
     auto user_map = list_to_index_map(contact_user);
     switch (i) {
     case 1:
-        for (const auto& [k, v] : user_map) {
-            cout << k << " : " << v << endl;
-        }
+        for (const auto& [k, v] : user_map) {cout << k << " : " << v << endl;}
         break;
-
     case 2: {
         cout << "write user_name to find: " << endl;
         string user_n;
-        cin >> user_n;
-
+        // cin >> user_n;
+        getline(cin, user_n);
         auto it = user_map.find(user_n);
         if (it != user_map.end()) {
             cout << "user id is " << it->second << endl;
@@ -195,7 +197,8 @@ map<list<string>, list<string>>  login_user::show_send_message(const login_user&
     string name= u.get_user_name();
     cout<<"write username you want to chat" <<endl;
     string user_n;
-    cin>> user_n;
+    // cin>> user_n;
+    getline(cin,user_n);
     list<string>key;
     key.push_back(name);
     key.push_back(user_n);
@@ -208,21 +211,26 @@ map<list<string>, list<string>>  login_user::show_send_message(const login_user&
         for (string x : message_conv[key]) {cout << x << endl;}
         cout<<"send your message: (if your want send voice message end of message write -v-) "<<endl;
         string input;
-        cin>>input;
+        // cin>>input;
+        getline(cin,input);
         if  (input.size() >= 3 && input.substr(input.size() - 3) == "-v-") {
             // cout << "This message should send voice." << endl;
             time_t now = time(0);
             char* dt = ctime(&now);
-            string dt_str(dt);
+            string dt_str = ctime(&now);
+            dt_str.pop_back();
             voice_message meg(u,dt,input);
             string out_p;
-            out_p=user_id+"--> "+ dt_str +"  :  "+input+"  (voice) " ;
+            out_p=user_id+"--> "+dt_str+"  :  "+input+"  (voice) " ;
+            // out_p=user_id+dt_str+input+"  (voice) " ;
+
             message_conv[key].push_back(out_p);
         }
         else{
         time_t now = time(0);          
         char* dt = ctime(&now);
-        string dt_str(dt); 
+        string dt_str = ctime(&now);
+        dt_str.pop_back(); 
         text_message meg(u,dt,input);
         string out_p;
         out_p=user_id+"--> "+ dt_str +"  :  "+input+"  (text) " ;
