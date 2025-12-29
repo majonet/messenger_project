@@ -22,7 +22,7 @@ public:
     //
     void show_menu();
     void log_out();
-    void show_conversation(const login_user& u,map<string, list<string>>& conv);
+    void show_conversation(const login_user& u,map<string, list<string>>& conv,map<list<string>, list<string>>& message_conv);
     map<string, list<string>> new_conversation(login_user& u,map<string, list<string>>& conv,const list<string> &user_names);
     void show_all_users(list<string>&user_names,list<string> &full_names,list<string> &birthday,list<string> &passwords,list<string> &time_creates);
     map<list<string>, list<string>>show_send_message(const login_user& u,map<list<string>, list<string>>& message_conv);

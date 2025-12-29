@@ -11,6 +11,8 @@
 #include <set>
 #include <limits>
 #include <cstdlib>
+#include <thread>
+#include <chrono>
 using namespace std;
 
 list<string> load_data(string find) {
@@ -333,6 +335,8 @@ void login(list<string> &user_names,list<string> &full_names,list<string> &birth
       bool epoch=true;
       int choice;
 do {
+    // std::this_thread::sleep_for(std::chrono::seconds(2));
+    // system("cls");
     in_user.show_menu();
     cin >> choice;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
@@ -356,7 +360,9 @@ do {
 
     case 3:
         {map<string, list<string>> conv1=load_contacts("contact.txt");
-        in_user.show_conversation(in_user, conv1);
+        map<list<string>,list<string>> message_conv2;
+        load_messages("conv_message.txt",message_conv2);
+        in_user.show_conversation(in_user, conv1,message_conv2);
         break;}
 
     case 4:
@@ -390,7 +396,7 @@ do {
         cout << "Invalid choice\n";
         break;
     }
-        } while (choice != 5);
+        } while (true);
 
     }
     else{
@@ -436,7 +442,9 @@ while (true) {
     else {
         cout << "Invalid input, please choose 1, 2, or q." << endl;
     }
+    std::this_thread::sleep_for(std::chrono::seconds(2));
     system("cls"); 
+ 
 }
 
 }

@@ -167,7 +167,7 @@ map<string, list<string>> login_user::new_conversation(login_user& u, map<string
     return conv;
 }
 
-void login_user::show_conversation(const login_user& u,map<string, list<string>>& conv){
+void login_user::show_conversation(const login_user& u,map<string, list<string>>& conv,map<list<string>, list<string>>& message_conv){
     cout<<"choose one 1_sort base name. 2_search with user_name"<<endl;
     int i;
     cin>> i;
@@ -176,7 +176,18 @@ void login_user::show_conversation(const login_user& u,map<string, list<string>>
     auto user_map = list_to_index_map(contact_user);
     switch (i) {
     case 1:
-        for (const auto& [k, v] : user_map) {cout << k << " : " << v << endl;}
+        for (const auto& [k, v] : user_map) {cout << k << " : " << u.get_user_name()<< endl;
+        list<string>key;
+        key.push_back(u.get_user_name());
+        key.push_back(k);
+        key.sort();
+        for (string x : message_conv[key]) {
+                        for (char c : x) {
+                            if (c == ',') cout << endl;
+                            else cout << c;
+                        }
+        cout << endl;}
+        }
         break;
     case 2: {
         cout << "write user_name to find: " << endl;
@@ -186,13 +197,27 @@ void login_user::show_conversation(const login_user& u,map<string, list<string>>
         auto it = user_map.find(user_n);
         if (it != user_map.end()) {
             cout << "user id is " << it->second << endl;
-        } else {
+            list<string>key;
+            key.push_back(u.get_user_name());
+            key.push_back(user_n);
+            key.sort();
+            auto it = message_conv.find(key);
+            if (it != message_conv.end()) {
+                string user_id;
+                user_id=to_string(u.get_user_id()); 
+                cout<<"your id is : "<<user_id<<endl;
+                for (string x : message_conv[key]) {
+                        for (char c : x) {
+                            if (c == ',') cout << endl;
+                            else cout << c;
+                        }
+    cout << endl;}} 
+    else {
             cout << "user not found" << endl;
         }
         break;
     }}
-}
-
+}}
 map<list<string>, list<string>>  login_user::show_send_message(const login_user& u,map<list<string>, list<string>>& message_conv){
     string name= u.get_user_name();
     cout<<"write username you want to chat" <<endl;
@@ -208,7 +233,13 @@ map<list<string>, list<string>>  login_user::show_send_message(const login_user&
         string user_id;
         user_id=to_string(u.get_user_id()); 
         cout<<"your id is : "<<user_id<<endl;
-        for (string x : message_conv[key]) {cout << x << endl;}
+        // for (string x : message_conv[key]) {cout << x << endl;}
+        for (string x : message_conv[key]) {
+                        for (char c : x) {
+                            if (c == ',') cout << endl;
+                            else cout << c;
+                        }
+        cout << endl;}
         cout << "send your message (type q to quit, voice message end with -v-):" << endl;
         string input;
         while (true) {
