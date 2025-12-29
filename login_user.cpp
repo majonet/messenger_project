@@ -209,33 +209,35 @@ map<list<string>, list<string>>  login_user::show_send_message(const login_user&
         user_id=to_string(u.get_user_id()); 
         cout<<"your id is : "<<user_id<<endl;
         for (string x : message_conv[key]) {cout << x << endl;}
-        cout<<"send your message: (if your want send voice message end of message write -v-) "<<endl;
+        cout << "send your message (type q to quit, voice message end with -v-):" << endl;
         string input;
-        // cin>>input;
-        getline(cin,input);
-        if  (input.size() >= 3 && input.substr(input.size() - 3) == "-v-") {
-            // cout << "This message should send voice." << endl;
-            time_t now = time(0);
-            char* dt = ctime(&now);
-            string dt_str = ctime(&now);
-            dt_str.pop_back();
-            voice_message meg(u,dt,input);
-            string out_p;
-            out_p=user_id+"--> "+dt_str+"  :  "+input+"  (voice) " ;
-            // out_p=user_id+dt_str+input+"  (voice) " ;
+        while (true) {
+                getline(cin, input);
 
-            message_conv[key].push_back(out_p);
+                if (input == "q") {
+                    break;
+                }
+
+                time_t now = time(0);
+                string dt_str = ctime(&now);
+                dt_str.pop_back();
+
+                if (input.size() >= 3 && input.substr(input.size() - 3) == "-v-") {
+                    voice_message meg(u, ctime(&now), input);
+
+                    string out_p;
+                    out_p = user_id + "--> " + dt_str + "  :  " + input + "  (voice)";
+                    message_conv[key].push_back(out_p);
+                }
+                else {
+                    text_message meg(u, ctime(&now), input);
+
+                    string out_p;
+                    out_p = user_id + "--> " + dt_str + "  :  " + input + "  (text)";
+                    message_conv[key].push_back(out_p);
+                }
+            }
         }
-        else{
-        time_t now = time(0);          
-        char* dt = ctime(&now);
-        string dt_str = ctime(&now);
-        dt_str.pop_back(); 
-        text_message meg(u,dt,input);
-        string out_p;
-        out_p=user_id+"--> "+ dt_str +"  :  "+input+"  (text) " ;
-        message_conv[key].push_back(out_p);}  
-        } 
     else {
         cout << "user not found or not have chat with you" << endl;
     }
